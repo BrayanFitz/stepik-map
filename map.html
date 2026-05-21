@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Магистральная сеть «РунетТелеком»</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f8fafd;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .rnt-map-container {
+      max-width: 1000px;
+      width: 100%;
+      background: #f8fafd;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    .map-wrapper {
+      position: relative;
+    }
+    svg {
+      width: 100%;
+      height: auto;
+      background: radial-gradient(circle at 50% 50%, #f9fcff, #eef2f8);
+      border-radius: 8px;
+      border: 1px solid #dce3ec;
+    }
+    .ebgp-link, .ibgp-link {
+      transition: all 0.2s ease;
+      cursor: pointer;
+      stroke: #3a5a80;
+      stroke-width: 3;
+      stroke-opacity: 0.8;
+    }
+    .ebgp-link {
+      stroke: #d35400;
+      stroke-dasharray: none;
+    }
+    .ebgp-link:hover, .ibgp-link:hover {
+      stroke-opacity: 1;
+      stroke-width: 5;
+      filter: drop-shadow(0 0 4px rgba(0,160,255,0.6));
+    }
+    .info-panel {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(6px);
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 10px 15px;
+      max-width: 220px;
+      font-size: 0.9em;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      display: none;
+    }
+    .info-panel.active {
+      display: block;
+    }
+    .quiz-container {
+      margin-top: 15px;
+      padding: 12px;
+      background: #f0f7ff;
+      border-radius: 8px;
+      border: 1px solid #bdd3f0;
+      display: none;
+    }
+    .quiz-container.active {
+      display: block;
+    }
+    .quiz-check-btn {
+      margin-top: 8px;
+      background: #2c3e50;
+      color: white;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .quiz-check-btn:hover {
+      background: #1e2a38;
+    }
+    #quizFeedback {
+      font-weight: bold;
+      margin-left: 10px;
+    }
+    button {
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+<div class="rnt-map-container">
+  <h3 style="text-align:center; color: #1e2a38;">🌐 Магистральная сеть «РунетТелеком»</h3>
+
+  <div class="map-wrapper">
+    <svg viewBox="0 0 1000 600" xmlns="http://www.w3.org/2000/svg" id="networkMap">
+      <defs>
+        <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="2" dy="2" stdDeviation="3" flood-color="#00000022" />
+        </filter>
+        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+          <polygon points="0 0, 10 3.5, 0 7" fill="#d35400" />
+        </marker>
+      </defs>
+
+      <!-- Внешние операторы -->
+      <circle cx="400" cy="80" r="30" fill="#e0e7ff" stroke="#7c8db5" stroke-width="2" stroke-dasharray="5,3" />
+      <text x="400" y="85" font-size="12" text-anchor="middle" fill="#3b4b68">Ростелеком</text>
+      <text x="400" y="100" font-size="10" text-anchor="middle" fill="#5a6d8c">AS12389</text>
+
+      <circle cx="200" cy="150" r="30" fill="#e0e7ff" stroke="#7c8db5" stroke-width="2" stroke-dasharray="5,3" />
+      <text x="200" y="155" font-size="12" text-anchor="middle" fill="#3b4b68">MSK-IX</text>
+      <text x="200" y="170" font-size="10" text-anchor="middle" fill="#5a6d8c">AS50952</text>
+
+      <circle cx="780" cy="450" r="30" fill="#e0e7ff" stroke="#7c8db5" stroke-width="2" stroke-dasharray="5,3" />
+      <text x="780" y="455" font-size="12" text-anchor="middle" fill="#3b4b68">Kazakhtelecom</text>
+      <text x="780" y="470" font-size="10" text-anchor="middle" fill="#5a6d8c">AS9198</text>
+
+      <circle cx="100" cy="380" r="30" fill="#e0e7ff" stroke="#7c8db5" stroke-width="2" stroke-dasharray="5,3" />
+      <text x="100" y="385" font-size="12" text-anchor="middle" fill="#3b4b68">Beltelecom</text>
+      <text x="100" y="400" font-size="10" text-anchor="middle" fill="#5a6d8c">AS6697</text>
+
+      <circle cx="850" cy="200" r="30" fill="#e0e7ff" stroke="#7c8db5" stroke-width="2" stroke-dasharray="5,3" />
+      <text x="850" y="205" font-size="12" text-anchor="middle" fill="#3b4b68">China Telecom</text>
+      <text x="850" y="220" font-size="10" text-anchor="middle" fill="#5a6d8c">AS4134</text>
+
+      <!-- Города -->
+      <g class="city" transform="translate(400,200)">
+        <circle r="22" fill="#2c3e50" stroke="#1a252f" stroke-width="3" filter="url(#shadow)" />
+        <text y="6" font-size="14" text-anchor="middle" fill="#fff" font-weight="bold">МСК</text>
+      </g>
+      <g class="city" transform="translate(700,350)">
+        <circle r="22" fill="#2c3e50" stroke="#1a252f" stroke-width="3" filter="url(#shadow)" />
+        <text y="6" font-size="13" text-anchor="middle" fill="#fff" font-weight="bold">АЛМ</text>
+      </g>
+      <g class="city" transform="translate(250,300)">
+        <circle r="22" fill="#2c3e50" stroke="#1a252f" stroke-width="3" filter="url(#shadow)" />
+        <text y="6" font-size="14" text-anchor="middle" fill="#fff" font-weight="bold">МНС</text>
+      </g>
+      <g class="city" transform="translate(750,250)">
+        <circle r="22" fill="#2c3e50" stroke="#1a252f" stroke-width="3" filter="url(#shadow)" />
+        <text y="6" font-size="13" text-anchor="middle" fill="#fff" font-weight="bold">ПЕК</text>
+      </g>
+
+      <!-- iBGP -->
+      <line x1="420" y1="210" x2="680" y2="340" class="ibgp-link" data-id="Moscow-Almaty" />
+      <line x1="380" y1="220" x2="270" y2="290" class="ibgp-link" data-id="Moscow-Minsk" />
+      <line x1="420" y1="200" x2="730" y2="240" class="ibgp-link" data-id="Moscow-Beijing" />
+
+      <!-- eBGP -->
+      <line x1="400" y1="178" x2="400" y2="110" class="ebgp-link" data-id="Moscow-Rostelecom" marker-end="url(#arrowhead)" />
+      <line x1="380" y1="190" x2="230" y2="160" class="ebgp-link" data-id="Moscow-MSX" marker-end="url(#arrowhead)" />
+      <line x1="231" y1="310" x2="127" y2="366" class="ebgp-link" data-id="Minsk-Beltelecom" marker-end="url(#arrowhead)" />
+      <line x1="714" y1="367" x2="761" y2="427" class="ebgp-link" data-id="Almaty-Kazakhtelecom" marker-end="url(#arrowhead)" />
+      <line x1="770" y1="240" x2="820" y2="220" class="ebgp-link" data-id="Beijing-ChinaTelecom" marker-end="url(#arrowhead)" />
+    </svg>
+
+    <div id="linkDetails" class="info-panel">
+      <strong id="detailTitle">Стык не выбран</strong>
+      <span id="detailInfo"></span>
+      <button id="answerBtn" style="display:none; margin-top: 8px;">Ответить на вопрос</button>
+    </div>
+
+    <div id="quizBlock" class="quiz-container">
+      <p style="font-weight:bold;">Какой AS-номер у точки обмена трафиком MSK-IX?</p>
+      <label><input type="radio" name="mskix" value="12389"> 12389</label><br>
+      <label><input type="radio" name="mskix" value="50952"> 50952</label><br>
+      <label><input type="radio" name="mskix" value="20485"> 20485</label><br>
+      <label><input type="radio" name="mskix" value="65001"> 65001</label><br>
+      <button id="checkBtn" class="quiz-check-btn">Проверить</button>
+      <span id="quizFeedback"></span>
+    </div>
+  </div>
+  <p style="font-size:0.9em; color:#6c7a89; margin-top:8px; text-align:center;">
+    🖱️ Наведите на линию стыка, чтобы увидеть подробности. Кликните для постоянной подсветки.<br>
+    Найдите стык к MSK-IX и ответьте на вопрос.
+  </p>
+</div>
+
+<script>
+  (function() {
+    const detailPanel = document.getElementById('linkDetails');
+    const detailTitle = document.getElementById('detailTitle');
+    const detailInfo = document.getElementById('detailInfo');
+    const answerBtn = document.getElementById('answerBtn');
+    const quizBlock = document.getElementById('quizBlock');
+    const feedback = document.getElementById('quizFeedback');
+
+    const linksData = {
+      'Moscow-Rostelecom': {
+        name: 'Стык с Ростелеком (AS12389)',
+        info: 'eBGP, скорость 100G<br>Сеть: 198.51.100.0/30<br>Наш IP: .1, сосед .2'
+      },
+      'Moscow-MSX': {
+        name: 'Стык с MSK-IX (AS50952)',
+        info: 'Пиринг, скорость 40G<br>Сеть: 203.0.113.0/30<br>Наш IP: .1, сосед .2'
+      },
+      'Almaty-Kazakhtelecom': {
+        name: 'Стык с Kazakhtelecom (AS9198)',
+        info: 'eBGP, скорость 10G<br>Сеть: 198.51.101.0/30<br>Наш IP: .1, сосед .2'
+      },
+      'Minsk-Beltelecom': {
+        name: 'Стык с Beltelecom (AS6697)',
+        info: 'eBGP, скорость 10G<br>Сеть: 198.51.102.0/30<br>Наш IP: .1, сосед .2'
+      },
+      'Beijing-ChinaTelecom': {
+        name: 'Стык с China Telecom (AS4134)',
+        info: 'eBGP, скорость 20G<br>Сеть: 198.51.103.0/30<br>Наш IP: .1, сосед .2'
+      },
+      'Moscow-Almaty': {
+        name: 'Магистраль Москва – Алматы',
+        info: 'iBGP, 100G,<br>IP: 10.255.0.0/30'
+      },
+      'Moscow-Minsk': {
+        name: 'Магистраль Москва – Минск',
+        info: 'iBGP, 100G,<br>IP: 10.255.0.4/30'
+      },
+      'Moscow-Beijing': {
+        name: 'Магистраль Москва – Пекин',
+        info: 'iBGP, 100G,<br>IP: 10.255.0.8/30'
+      }
+    };
+
+    const links = document.querySelectorAll('.ebgp-link, .ibgp-link');
+    links.forEach(link => {
+      link.addEventListener('mouseover', function() {
+        const id = this.dataset.id;
+        if (linksData[id]) {
+          detailTitle.textContent = linksData[id].name;
+          detailInfo.innerHTML = linksData[id].info;
+          detailPanel.classList.add('active');
+          answerBtn.style.display = (id === 'Moscow-MSX') ? 'inline-block' : 'none';
+        }
+      });
+      link.addEventListener('mouseout', function() {
+        detailPanel.classList.remove('active');
+      });
+      link.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const id = this.dataset.id;
+        if (linksData[id]) {
+          detailTitle.textContent = linksData[id].name;
+          detailInfo.innerHTML = linksData[id].info;
+          detailPanel.classList.add('active');
+          answerBtn.style.display = (id === 'Moscow-MSX') ? 'inline-block' : 'none';
+        }
+      });
+    });
+
+    answerBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      quizBlock.classList.add('active');
+      feedback.textContent = '';
+      document.querySelectorAll('input[name="mskix"]').forEach(r => r.checked = false);
+    });
+
+    document.getElementById('checkBtn').addEventListener('click', function(e) {
+      e.stopPropagation();
+      const selected = document.querySelector('input[name="mskix"]:checked');
+      if (!selected) {
+        feedback.textContent = 'Пожалуйста, выберите вариант ответа.';
+        feedback.style.color = '#c0392b';
+        return;
+      }
+      if (selected.value === '50952') {
+        feedback.textContent = '✅ Верно! AS50952 принадлежит MSK-IX.';
+        feedback.style.color = '#27ae60';
+        answerBtn.style.display = 'none';
+      } else {
+        feedback.textContent = '❌ Неверно. Попробуйте ещё раз.';
+        feedback.style.color = '#c0392b';
+      }
+    });
+
+    // Скрываем панель при клике вне
+    document.addEventListener('click', function() {
+      detailPanel.classList.remove('active');
+    });
+  })();
+</script>
+</body>
+</html>
